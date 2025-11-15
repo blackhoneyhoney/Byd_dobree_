@@ -6,25 +6,21 @@ import logging
 import openai
 import httpx
 
+# Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Загружаем переменные из .env
 load_dotenv()
 
+# API ключ - ДОЛЖЕН БЫТЬ ДЕЙСТВИТЕЛЬНЫМ
 TOKEN = os.getenv("GEMINI_API_KEY")
 
-# Конфигурация прокси - с проверкой на наличие
-proxy_config = os.getenv("PROXY_URL", "http://MKnEA2:hgbt68@168.81.65.13:8000")
-
-try:
-    client = httpx.Client(
-        proxy=proxy_config,
-        timeout=30.0,
-    )
-    logger.info("✅ Прокси настроен")
-except Exception as e:
-    logger.warning(f"⚠️ Ошибка настройки прокси: {e}. Работа без прокси.")
-    client = httpx.Client(timeout=30.0)
+# Настройка клиента с прокси
+client = httpx.Client(
+    proxy="http://MKnEA2:hgbt68@168.81.65.13:8000",
+    timeout=30.0,
+)
 
 openai_client = openai.OpenAI(
     http_client=client,
@@ -37,12 +33,13 @@ app = Flask(__name__)
 
 def generate_with_gemini(prompt, max_retries=3):
     """Универсальная функция генерации с повторными попытками"""
+
     for attempt in range(max_retries):
         try:
             logger.info(f"🤖 Попытка генерации {attempt + 1}")
 
             response = openai_client.chat.completions.create(
-                model="gemini-2.0-flash-lite",
+                model="gemini-2.0-flash-lite",  # Используем Flash-Lite модель
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.8,
                 max_tokens=2048,
@@ -61,6 +58,8 @@ def generate_with_gemini(prompt, max_retries=3):
 
             if attempt == max_retries - 1:
                 raise e
+
+            # Увеличиваем задержку между попытками
             time.sleep(2 * (attempt + 1))
 
 
@@ -108,6 +107,7 @@ def generate_storyboard(prompt, script, video_type, duration):
         minutes = duration // 60
         duration_text = f"{minutes} минут"
 
+    # Обрезаем слишком длинный скрипт
     truncated_script = script[:1000] + "..." if len(script) > 1000 else script
 
     system_prompt = f"""Создай раскадровку для {video_type} видео длительностью {duration_text} на тему "{prompt}".
@@ -148,6 +148,7 @@ def health_check():
         if not TOKEN:
             return jsonify({"status": "error", "message": "API ключ не настроен"}), 500
 
+        # Быстрая проверка
         response = openai_client.chat.completions.create(
             model="gemini-2.0-flash-lite",
             messages=[{"role": "user", "content": "Тест"}],
@@ -187,11 +188,11 @@ def generate():
             return jsonify({"error": "Слишком длинный промпт. Максимум 500 символов."}), 400
 
         if not TOKEN:
-            return jsonify({"error": "Не настроен API ключ Gemini. Добавьте GEMINI_API_KEY в настройки Render"}), 500
+            return jsonify({"error": "Не настроен API ключ Gemini. Создайте файл .env с GEMINI_API_KEY"}), 500
 
         logger.info(f"Запрос генерации: {prompt[:50]}...")
 
-        # генерируем сценарий
+        # Генерируем сценарий
         script = generate_script(prompt, video_type, duration)
 
         result = {
@@ -211,8 +212,9 @@ def generate():
         error_msg = str(e)
         logger.error(f"❌ Ошибка генерации: {error_msg}")
 
+        # Более понятные сообщения об ошибках
         if "API ключ" in error_msg or "TOKEN" in error_msg:
-            error_msg = "Не настроен API ключ Gemini. Добавьте GEMINI_API_KEY в настройки Render"
+            error_msg = "Не настроен API ключ Gemini. Создайте файл .env с GEMINI_API_KEY"
         elif "quota" in error_msg.lower():
             error_msg = "Превышена дневная квота Gemini API. Попробуйте завтра или используйте другой API ключ."
         elif "429" in error_msg:
@@ -220,7 +222,7 @@ def generate():
         elif "503" in error_msg or "Service Unavailable" in error_msg:
             error_msg = "Сервер Gemini временно недоступен. Попробуйте позже."
         elif "401" in error_msg:
-            error_msg = "Неверный API ключ Gemini. Проверьте ключ в настройках Render"
+            error_msg = "Неверный API ключ Gemini. Проверьте ключ в .env"
         elif "timeout" in error_msg.lower() or "Timeout" in error_msg:
             error_msg = "Превышено время ожидания ответа. Попробуйте еще раз."
         elif "404" in error_msg:
@@ -233,7 +235,7 @@ def generate():
 
 @app.errorhandler(500)
 def internal_error(error):
-    logger.error(f"Внутренняя ошибка сервера: {error}")
+    logger.error(f"❌ Внутренняя ошибка сервера: {error}")
     return jsonify({"error": "Внутренняя ошибка сервера"}), 500
 
 
