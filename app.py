@@ -17,10 +17,23 @@ load_dotenv()
 TOKEN = os.getenv("GEMINI_API_KEY")
 
 # Настройка клиента с прокси
-client = httpx.Client(
-    proxy="http://MKnEA2:hgbt68@168.81.65.13:8000",
-    timeout=30.0,
-)
+# Конфигурация прокси
+proxy_config = "http://MKnEA2:hgbt68@168.81.65.13:8000"
+
+try:
+    # Новый синтаксис для httpx
+    proxies = {
+        "http://": proxy_config,
+        "https://": proxy_config
+    }
+    client = httpx.Client(
+        proxies=proxies,
+        timeout=30.0,
+    )
+    logger.info("✅ Прокси настроен")
+except Exception as e:
+    logger.warning(f"⚠️ Ошибка настройки прокси: {e}. Работа без прокси.")
+    client = httpx.Client(timeout=30.0)
 
 openai_client = openai.OpenAI(
     http_client=client,
