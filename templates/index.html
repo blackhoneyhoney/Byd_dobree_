@@ -3,22 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генератор сценариев для рилсов</title>
+    <title>SceneCraft - Создание видео с помощью ИИ</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎬 Генератор сценариев для рилсов</h1>
-            <p class="subtitle">Создавайте профессиональные сценарии для коротких видео</p>
-        </header>
+<!-- Навигационное меню -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <h2>SceneCraft</h2>
+        </div>
 
-        <main>
-            <form id="promptForm" class="prompt-form">
-                <div class="form-group">
-                    <label for="videoType">Выберите тип видео:</label>
-                    <select id="videoType" name="videoType" required>
-                        <option value="">Выберите тип видео </option>
+        <div class="auth-buttons">
+            <button class="btn-login">Войти</button>
+            <button class="btn-register">Регистрация</button>
+        </div>
+    </div>
+</nav>
+
+<!-- Главный заголовок -->
+<header>
+    <div class="info-text">
+        <h1>Создаем с помощью ИИ</h1>
+        <p>Превратите ваши идеи в профессиональные видео за считанные минуты</p>
+        <p>С чего бы вы хотели начать?</p>
+    </div>
+</header>
+
+<!-- Основной контент -->
+<main>
+    <!-- Секция генерации видео -->
+    <section class="generation-section">
+        <div class="input">
+            <h3 id="input-text">Опишите ваше видео</h3>
+            <textarea id="text" placeholder="Например: Короткое видео о преимуществах нашего нового продукта для социальных сетей..."></textarea>
+
+            <div class="selectors-container">
+                <div class="select-block type-video">
+                    <p id="video-type-text">Тип видео</p>
+                    <select id="video-type">
+                        <option value="">Выберите тип видео</option>
                         <option value="рекламное">📢 Рекламное</option>
                         <option value="игровое">🎮 Игровое</option>
                         <option value="развлекательное">😄 Развлекательное</option>
@@ -28,71 +52,92 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="duration">Выберите хронометраж видео:</label>
-                    <select id="duration" name="duration" required>
-                        <option value="">-- Выберите хронометраж --</option>
-                        <option value="15">15 секунд</option>
-                        <option value="30">30 секунд</option>
-                        <option value="60">60 секунд</option>
-                        <option value="90">90 секунд</option>
+                <div class="select-block timeline">
+                    <p id="time-video-text">Длительность (секунд)</p>
+                    <select id="time-video">
+                        <option value="15">15</option>
+                        <option value="30">30</option>
+                        <option value="60">60</option>
+                        <option value="90">90</option>
                     </select>
                 </div>
-
-                <div class="form-group">
-                    <label for="prompt">Введите тему для сценария:</label>
-                    <textarea
-                        id="prompt"
-                        name="prompt"
-                        placeholder="Например: котики, путешествия, кулинария..."
-                        rows="3"
-                        required
-                    ></textarea>
-                </div>
-
-                <div class="form-group checkbox-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="generateStoryboard" name="generateStoryboard">
-                        <span>Генерировать раскадровку с описаниями изображений</span>
-                    </label>
-                </div>
-
-                <button type="submit" id="submitBtn" class="submit-btn">
-                    <span class="btn-text">Сгенерировать сценарий</span>
-                    <span class="btn-loader" style="display: none;">⏳ Генерация...</span>
-                </button>
-            </form>
-
-            <div id="results" class="results" style="display: none;">
-                <div class="result-section">
-                    <h2>📝 Сценарий</h2>
-                    <div id="scriptContent" class="content-box"></div>
-                </div>
-
-                <div id="storyboardSection" class="result-section" style="display: none;">
-                    <h2>🎨 Раскадровка</h2>
-                    <div id="storyboardContent" class="content-box"></div>
-                </div>
             </div>
 
-            <div id="error" class="error-message" style="display: none;"></div>
-
-            <div id="progressContainer" class="progress-container" style="display: none;">
-                <div class="progress-info">
-                    <span id="progressStatus">Подготовка...</span>
-                    <div class="progress-stats">
-                        <span id="progressPercent">0%</span>
-                        <span id="progressTime" class="progress-time">—</span>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div id="progressBarFill" class="progress-bar-fill" style="width: 0%"></div>
-                </div>
+            <div class="toggle-container">
+                <label class="toggle-label">
+                    <input type="checkbox" id="generate-storyboard" class="toggle-input">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">Генерировать раскадровку</span>
+                </label>
             </div>
-        </main>
+
+            <button class="btn-generate">Сгенерировать сценарий</button>
+        </div>
+    </section>
+
+    <!-- Индикатор загрузки -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>ИИ генерирует ваш контент... Это займет несколько секунд</p>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Секция результатов -->
+    <section class="results-section" id="results-section">
+        <h2>Результаты генерации</h2>
+        <div class="results-container">
+            <div class="result-text">
+                <h3>Сценарий видео</h3>
+                <p id="generated-text">Здесь будет отображаться сгенерированный ИИ текст сценария...</p>
+            </div>
+
+            <div class="result-text" id="storyboard-section" style="display: none;">
+                <h3>Раскадровка</h3>
+                <p id="generated-storyboard">Здесь будет отображаться раскадровка...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция процесса работы -->
+    <section class="process-section">
+        <h2>Как это работает?</h2>
+        <div class="process-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Опишите идею</h3>
+                <p>Расскажите нашему ИИ о том, какое видео вы хотите создать</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Настройте параметры</h3>
+                <p>Выберите тип и длительность видео</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Генерация</h3>
+                <p>Наш ИИ создаст видео на основе ваших предпочтений</p>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Скачайте результат</h3>
+                <p>Получите готовое видео в нужном формате</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Подвал -->
+<footer id="contact">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>SceneCraft</h3>
+            <p>Создавайте профессиональные видео с помощью искусственного интеллекта</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2025 SceneCraft. Все права защищены.</p>
+    </div>
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-
