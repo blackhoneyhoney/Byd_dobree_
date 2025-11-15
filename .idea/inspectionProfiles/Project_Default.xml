@@ -1,0 +1,23 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="ignoredPackages">
+        <list>
+          <option value="Django" />
+          <option value="djangorestframework" />
+          <option value="djangorestframework-simplejwt" />
+          <option value="django-cors-headers" />
+          <option value="mysqlclient" />
+          <option value="Pillow" />
+          <option value="celery" />
+          <option value="redis" />
+          <option value="scikit-learn" />
+          <option value="numpy" />
+          <option value="joblib" />
+          <option value="geopy" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

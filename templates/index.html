@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор сценариев для рилсов</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Генератор сценариев для рилсов</h1>
+            <p class="subtitle">Создавайте профессиональные сценарии для коротких видео</p>
+        </header>
+
+        <main>
+            <form id="promptForm" class="prompt-form">
+                <div class="form-group">
+                    <label for="videoType">Выберите тип видео:</label>
+                    <select id="videoType" name="videoType" required>
+                        <option value="">Выберите тип видео </option>
+                        <option value="рекламное">📢 Рекламное</option>
+                        <option value="игровое">🎮 Игровое</option>
+                        <option value="развлекательное">😄 Развлекательное</option>
+                        <option value="образовательное">📚 Образовательное</option>
+                        <option value="обзорное">🔍 Обзорное</option>
+                        <option value="мотивационное">💪 Мотивационное</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="duration">Выберите хронометраж видео:</label>
+                    <select id="duration" name="duration" required>
+                        <option value="">-- Выберите хронометраж --</option>
+                        <option value="15">15 секунд</option>
+                        <option value="30">30 секунд</option>
+                        <option value="60">60 секунд</option>
+                        <option value="90">90 секунд</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="prompt">Введите тему для сценария:</label>
+                    <textarea
+                        id="prompt"
+                        name="prompt"
+                        placeholder="Например: котики, путешествия, кулинария..."
+                        rows="3"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="generateStoryboard" name="generateStoryboard">
+                        <span>Генерировать раскадровку с описаниями изображений</span>
+                    </label>
+                </div>
+
+                <button type="submit" id="submitBtn" class="submit-btn">
+                    <span class="btn-text">Сгенерировать сценарий</span>
+                    <span class="btn-loader" style="display: none;">⏳ Генерация...</span>
+                </button>
+            </form>
+
+            <div id="results" class="results" style="display: none;">
+                <div class="result-section">
+                    <h2>📝 Сценарий</h2>
+                    <div id="scriptContent" class="content-box"></div>
+                </div>
+
+                <div id="storyboardSection" class="result-section" style="display: none;">
+                    <h2>🎨 Раскадровка</h2>
+                    <div id="storyboardContent" class="content-box"></div>
+                </div>
+            </div>
+
+            <div id="error" class="error-message" style="display: none;"></div>
+
+            <div id="progressContainer" class="progress-container" style="display: none;">
+                <div class="progress-info">
+                    <span id="progressStatus">Подготовка...</span>
+                    <div class="progress-stats">
+                        <span id="progressPercent">0%</span>
+                        <span id="progressTime" class="progress-time">—</span>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div id="progressBarFill" class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+
